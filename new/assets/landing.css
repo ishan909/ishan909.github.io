@@ -1,0 +1,59 @@
+html {
+    height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    background: url('../assets/background/2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: Times;
+    letter-spacing: 0.05rem;
+}
+
+.navbar-dark .navbar-nav .nav-link:focus, .navbar-dark .navbar-nav .nav-link {
+    text-transform: uppercase;
+    letter-spacing: 0.07rem;
+}
+
+h1 {
+    color: white;
+}
+
+h5 {
+    color: white;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #333;
+    background-image: linear-gradient(to right, #333, #ccc, #333);
+}
+
+#content {
+    text-align: center;
+    padding-top: 33%;
+}
+
+.socialicon {
+    margin: 0 auto;
+    margin-top: 0%;
+    border-radius: 0%;
+
+    -webkit-filter: invert(1);
+    filter: invert(1);
+}
+
+.icon {
+    margin: 0 auto;
+    margin-top: 0%;
+    border-radius: 0%;
+}
+
+    /* .icon:hover {
+        background: #e6c300;
+        border-radius: 50%;
+        transition: all 2.0s ease 0s;
+    } */
