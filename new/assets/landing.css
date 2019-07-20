@@ -9,12 +9,18 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     font-family: Times;
-    letter-spacing: 0.05rem;
+    font-variant: small-caps;
+    letter-spacing: .08rem;
 }
 
-.navbar-dark .navbar-nav .nav-link:focus, .navbar-dark .navbar-nav .nav-link {
-    text-transform: uppercase;
-    letter-spacing: 0.07rem;
+.all {
+    top: 50%;
+    margin-top: -100px;
+    left: 15%;
+    width: 70%;
+    line-height: 100%;
+    position: absolute;
+    text-align: center;
 }
 
 h1 {
@@ -43,5 +49,5 @@ hr {
     margin-left: 2%;
     margin-right: 2%;
     border-radius: 0%;
-    padding: 2px;
+    padding: 4px;
 }
