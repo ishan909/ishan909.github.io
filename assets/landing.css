@@ -1,0 +1,47 @@
+html {
+    height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: Times;
+    font-variant: small-caps;
+    letter-spacing: .08rem;
+}
+
+.all {
+    top: 50%;
+    margin-top: -100px;
+    left: 15%;
+    width: 70%;
+    line-height: 100%;
+    position: absolute;
+    text-align: center;
+}
+
+h1 {
+    color: white;
+}
+
+h5 {
+    color: white;
+}
+
+hr {
+    border: 0;
+    height: 2px;
+    background: #30444F;
+    background-image: linear-gradient(to right, #30444F, #ccc, #30444F);
+}
+
+.icon {
+    margin: 0 auto;
+    margin-top: 0%;
+    margin-left: 2%;
+    margin-right: 2%;
+    border-radius: 0%;
+    padding: 4px;
+}
