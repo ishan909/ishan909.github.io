@@ -31,10 +31,9 @@ h5 {
 }
 
 hr {
-    border: 0;
-    height: 2px;
+    height: 1px;
     background: #30444F;
-    background-image: linear-gradient(to right, #30444F, #ccc, #30444F);
+    background-image: linear-gradient(to right, #30444F, #ffffff, #30444F);
 }
 
 .icon {
@@ -44,4 +43,15 @@ hr {
     margin-right: 2%;
     border-radius: 0%;
     padding: 4px;
+}
+
+.icon:hover {
+    background: #C9B522;
+    border-radius: 10%;
+    transition: all 0.2s ease 0s;
+}
+
+/* mouse over link */
+a:hover {
+    color: #30444F;
 }
