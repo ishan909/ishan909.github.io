@@ -1,0 +1,189 @@
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+
+<!-- Setup for slider -->
+<script src="https://unpkg.com/d3-simple-slider"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
+
+<style>
+    .bottom-three {
+        margin-bottom: 1cm;
+    }
+
+    p {
+        text-align: justify;
+        margin: 25%;
+    }
+</style>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <title>Carbon Dioxide Global Trends</title>
+    <div class="bottom-three">
+        <center>
+            <a href="/">
+                <h1 class="mt-2">Carbon Dioxide Global Trends</h1>
+            </a>
+        </center>
+    </div>
+</head>
+
+<body onload='init()'>
+    <div class="row justify-content-center">
+        <div>
+            <p class="bottom-three">
+                Below we can see the change in recorded CO2 emissions globally. We see that
+                emissions were relatively low in the 1800s, but skyrocketed in the 1900 (likely
+                due to the Industrial Revolution).
+            </p>
+        </div>
+        <div>
+            <div id="chart"><svg></svg></div>
+            <div class="col-sm">
+                <div id="slider-time"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <!-- Bootstrap buttons: https://getbootstrap.com/docs/4.0/components/navs/#pills -->
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">Introduction</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="world.html">Page 1</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="regions.html">Page 2</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="gdp.html">Page 3</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="conclusion.html">Conclusion</a>
+            </li>
+        </ul>
+    </div>
+    <p class="bottom-three"> </p>
+
+    <script>
+        async function init() {
+            const raw_data = await d3.csv(
+                "https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-data.csv"
+            );
+
+            var width = 600;
+            var height = 300;
+            var margin = 50;
+
+            // Time slider
+            // Code reference: https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
+            var dataTime = d3.range(0, 257).map(function (d) {
+                return new Date(1760 + d, 01, 01);
+            });
+            var ticks = d3.range(0, 256 / 20).map(function (d) {
+                return new Date(1760 + 20 * d, 01, 01);
+            });
+            var sliderTime = d3
+                .sliderBottom()
+                .min(d3.min(dataTime))
+                .max(d3.max(dataTime))
+                .step(1000 * 60 * 60 * 24 * 365)
+                .width(width)
+                .tickFormat(d3.timeFormat('%Y'))
+                .tickValues(ticks)
+                .default(new Date(2015, 01, 01))
+                .on('onchange', val => {
+                    d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+                    updateGraph(val)
+                });
+            updateGraph(sliderTime.value());
+
+            function updateGraph(sliderTimeVal) {
+                // clear svg
+                d3.select("svg").remove();
+
+                // readd svg
+                d3.select("#chart").append("svg")
+                    .attr("height", height + 2 * margin)
+                    .attr("width", width + 2 * margin)
+
+                // set axis scale
+                xs = d3.scaleTime()
+                    .domain([new Date(1740, 0, 1), new Date((sliderTimeVal.getYear() + 1900), 0, 1)])
+                    .rangeRound([margin, width - margin]);
+
+                function getMaxYValue(d) {
+                    return raw_data.filter(function (d) {
+                        return (d.year == (sliderTimeVal.getYear() + 1900)) &&
+                            (d.country == "World");
+                    })[0].co2;
+                };
+                ys = d3.scaleLinear().domain([0, Math.max(50, getMaxYValue(raw_data))]).range([height, 0]);
+
+                // draw chart
+                var lineFunction = d3.line()
+                    .x(function (d, i) {
+                        var date = new Date(d.year + "-01-01");
+                        return xs(date);
+                    })
+                    .y(function (d) {
+                        return ys(d.co2);
+                    });
+                var lineGraph = d3.select("svg").append("path")
+                    .attr("transform", "translate(" + margin + "," + margin + ")")
+                    .attr("d", lineFunction(raw_data.filter(function (d) {
+                        return (d.year <= (sliderTimeVal.getYear() + 1900)) &&
+                            (d.country == "World");
+                    })))
+                    .attr("stroke", "red")
+                    .attr("stroke-width", 2)
+                    .attr("fill", "none");
+
+                // Set SVG axis
+                // Y axis
+                d3.select("svg").append("g")
+                    .attr("transform", "translate(" + (margin / 2) + "," + (margin) + ")")
+                    .append("text")
+                    .attr("class", "y label")
+                    .attr("text-anchor", "end")
+                    .attr("y", 0)
+                    .attr("dy", ".75em")
+                    .attr("transform", "rotate(-90)")
+                    .text("Global recorded CO2 emissions (million T)");
+                d3.select("svg").append("g")
+                    .attr("transform", "translate(" + (2 * margin) + "," + margin + ")")
+                    .call(d3.axisLeft(ys));
+
+                // X axis
+                d3.select("svg").append("g")
+                    .attr("transform", "translate(" + (-4.5 * margin) + "," + (5) + ")")
+                    .append("text")
+                    .attr("class", "x label")
+                    .attr("text-anchor", "end")
+                    .attr("x", width)
+                    .attr("y", height + margin + 32)
+                    .text("Year")
+                d3.select("svg").append("g")
+                    .attr("transform", "translate(" + margin + "," + (height + margin) + ")")
+                    .call(d3.axisBottom(xs).tickFormat(d3.timeFormat("%Y")));
+            }
+
+            // Add slider
+            var gTime = d3
+                .select('div#slider-time')
+                .append('svg')
+                .attr('width', width + 2 * margin)
+                .attr('height', 100)
+                .append('g')
+                .attr("transform", "translate(" + (margin / 2) + "," + (margin / 2) + ")");
+            gTime.call(sliderTime);
+        }
+    </script>
+</body>
+
+</html>

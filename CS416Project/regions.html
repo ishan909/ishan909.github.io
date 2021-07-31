@@ -1,0 +1,238 @@
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+
+<!-- Setup for slider -->
+<script src="https://unpkg.com/d3-simple-slider"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
+
+<!-- Style -->
+<style>
+    .bottom-three {
+        margin-bottom: 2cm;
+    }
+
+    p {
+        text-align: justify;
+        margin: 25%;
+    }
+
+    rect {
+        /* fill: lightblue; */
+        stroke: black;
+    }
+
+    div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: 100px;
+        height: 28px;
+        padding: 2px;
+        font: 14px sans-serif;
+        background: lightsteelblue;
+        pointer-events: none;
+    }
+</style>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <title>Carbon Dioxide Global Trends</title>
+    <div class="bottom-three">
+        <center>
+            <a href="/">
+                <h1 class="mt-2">Carbon Dioxide Global Trends</h1>
+            </a>
+        </center>
+    </div>
+</head>
+
+<body onload='init()'>
+    <div class="row justify-content-center">
+        <div>
+            <p class="bottom-three">
+                To futher examine where the bulk of the CO2 is emitted, we can
+                view the emissions by region. Here we display the per capita CO2 
+                emissions each year since 1850.
+            </p>
+        </div>
+        <div>
+            <div id="chart"><svg></svg></div>
+            <div class="col-sm">
+                <div id="slider-time"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <!-- Bootstrap buttons: https://getbootstrap.com/docs/4.0/components/navs/#pills -->
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">Introduction</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="world.html">Page 1</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="regions.html">Page 2</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="gdp.html">Page 3</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="conclusion.html">Conclusion</a>
+            </li>
+        </ul>
+    </div>
+    <p class="bottom-three"> </p>
+
+    <script>
+        // Define the div for the tooltip
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        async function init() {
+            var width = 550;
+            var height = 300;
+            var margin = 50;
+
+            var regions = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"];
+            xs = d3.scaleBand().domain(regions).range([0, width]);
+            ys = d3.scaleLinear().domain([0, 16]).range([height, 0]);
+
+            const raw_data = await d3.csv(
+                "https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-data.csv"
+            );
+
+            // Time slider
+            // Code reference: https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
+            var dataTime = d3.range(0, 167).map(function (d) {
+                return new Date(1850 + d, 01, 01);
+            });
+            var ticks = d3.range(0, 166 / 10).map(function (d) {
+                return new Date(1850 + 10 * d, 01, 01);
+            });
+            var sliderTime = d3
+                .sliderBottom()
+                .min(d3.min(dataTime))
+                .max(d3.max(dataTime))
+                .step(1000 * 60 * 60 * 24 * 365)
+                .width(width)
+                .tickFormat(d3.timeFormat('%Y'))
+                .tickValues(ticks)
+                .default(new Date(2015, 01, 01))
+                .on('onchange', val => {
+                    d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+                    updateGraph(val)
+                });
+            updateGraph(sliderTime.value());
+
+            function getRegionColor(region) {
+                // Color Picker: https://learnui.design/tools/data-color-picker.html
+                if (region == "Africa") {
+                    return "#003f5c";
+                } else if (region == "Asia") {
+                    return "#444e86";
+                } else if (region == "Europe") {
+                    return "#955196";
+                } else if (region == "North America") {
+                    return "#dd5182";
+                } else if (region == "Oceania") {
+                    return "#ff6e54";
+                } else if (region == "South America") {
+                    return "#ffa600";
+                } else {
+                    return "grey";
+                }
+            }
+
+            function updateGraph(sliderTimeVal) {
+                d3.select("svg").remove();
+                d3.select("#chart").append("svg")
+                    .attr("width", width + 2 * margin)
+                    .attr("height", height + 2 * margin)
+                    .append("g")
+                    .attr("transform", "translate(" + margin + "," + margin + ")")
+                    .selectAll()
+                    .data(raw_data.filter(function (d) {
+                        return (d.year == (sliderTimeVal.getYear() + 1900)) &&
+                            regions.includes(d.country);
+                    }))
+                    .enter()
+                    .append('rect')
+                    .attr('x', function (d, i) {
+                        return xs(d.country);
+                    })
+                    .attr('y', function (d) {
+                        return ys(d.co2_per_capita);
+                    })
+                    .attr('width', xs.bandwidth())
+                    .attr('height', function (d) {
+                        return height - ys(d.co2_per_capita);
+                    })
+                    .attr("fill", function (d) {
+                        return getRegionColor(d.country);
+                    })
+                    // Tooltip reference: https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+                    .on("mouseover", function (d) {
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        div.html(d.country + "<br/>" + d.co2_per_capita)
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", function (d) {
+                        div.transition()
+                            .duration(500)
+                            .style("opacity", 0);
+                    });
+
+                // Set SVG axis
+                // Y axis
+                d3.select("svg").append("g")
+                    .attr("transform", "translate(" + 2 + "," + margin + ")")
+                    .append("text")
+                    .attr("class", "y label")
+                    .attr("text-anchor", "end")
+                    .attr("y", 0)
+                    .attr("dy", ".75em")
+                    .attr("transform", "rotate(-90)")
+                    .text("CO2 emissions per capita (tonnes/year)");
+                d3.select("svg").append("g")
+                    .attr("transform", "translate(" + margin + "," + margin + ")")
+                    .call(d3.axisLeft(ys));
+
+                // X axis
+                d3.select("svg").append("g")
+                    .attr("transform", "translate(" + (-margin) + "," + (5) + ")")
+                    .append("text")
+                    .attr("class", "x label")
+                    .attr("text-anchor", "end")
+                    .attr("x", width / 3 * 2.1)
+                    .attr("y", height + margin + 32)
+                    .text("Region")
+                d3.select("svg").append("g")
+                    .attr("transform", "translate(" + margin + "," + (height + margin) + ")")
+                    .call(d3.axisBottom(xs).tickValues(["Africa", "Asia", "Europe", "North America", "Oceania",
+                        "South America"
+                    ]));
+            }
+
+            // Add slider
+            var gTime = d3
+                .select('div#slider-time')
+                .append('svg')
+                .attr('width', width + 2 * margin)
+                .attr('height', 100)
+                .append('g')
+                .attr("transform", "translate(" + (margin / 2) + "," + (margin / 2) + ")");
+            gTime.call(sliderTime);
+
+        }
+    </script>
+</body>
+
+</html>
