@@ -37,8 +37,9 @@
         <div>
             <p class="bottom-three">
                 Below we can see the change in recorded CO2 emissions globally. We see that
-                emissions were relatively low in the 1800s, but skyrocketed in the 1900 (likely
-                due to the Industrial Revolution).
+                emissions were relatively low in the early 1800s, but skyrocketed in the
+                late 1800s (likely due to the Industrial Revolution) and continued to increase
+                ever since.
             </p>
         </div>
         <div>
@@ -143,6 +144,62 @@
                     .attr("stroke", "red")
                     .attr("stroke-width", 2)
                     .attr("fill", "none");
+
+                // 2nd Industrial Revolution
+                if (sliderTimeVal.getYear() + 1900 >= 1870) {
+                    d3.select("svg").append('line')
+                        .style("stroke", "grey")
+                        .style("stroke-dasharray", ("3, 3"))
+                        .attr("x1", xs(new Date(1870, 0, 1)) + margin)
+                        .attr("y1", margin)
+                        .attr("x2", xs(new Date(1870, 0, 1)) + margin)
+                        .attr("y2", height + margin);
+                    d3.select("svg").append("g")
+                        .attr("transform", "translate(" + (xs(new Date(1870, 0, 1)) + margin) + "," + (margin) +
+                            ")")
+                        .append("text")
+                        .style("font-size", "12px")
+                        .attr("text-anchor", "end")
+                        .attr("x", -3)
+                        .attr("y", 5)
+                        .text("Start 2nd Industrial Revolution");
+                }
+                // Ford's Assembly Line
+                if (sliderTimeVal.getYear() + 1900 >= 1914) {
+                    d3.select("svg").append('line')
+                        .style("stroke", "grey")
+                        .style("stroke-dasharray", ("3, 3"))
+                        .attr("x1", xs(new Date(1914, 0, 1)) + margin)
+                        .attr("y1", margin)
+                        .attr("x2", xs(new Date(1914, 0, 1)) + margin)
+                        .attr("y2", height + margin);
+                    d3.select("svg").append("g")
+                        .attr("transform", "translate(" + (xs(new Date(1914, 0, 1)) + margin) + "," + margin + ")")
+                        .append("text")
+                        .style("font-size", "12px")
+                        .attr("text-anchor", "end")
+                        .attr("x", -3)
+                        .attr("y", 25)
+                        .text("Ford's Assembly Line");
+                }
+                // Home Computing
+                if (sliderTimeVal.getYear() + 1900 >= 1980) {
+                    d3.select("svg").append('line')
+                        .style("stroke", "grey")
+                        .style("stroke-dasharray", ("3, 3"))
+                        .attr("x1", xs(new Date(1980, 0, 1)) + margin)
+                        .attr("y1", margin)
+                        .attr("x2", xs(new Date(1980, 0, 1)) + margin)
+                        .attr("y2", height + margin);
+                    d3.select("svg").append("g")
+                        .attr("transform", "translate(" + (xs(new Date(1980, 0, 1)) + margin) + "," + margin + ")")
+                        .append("text")
+                        .style("font-size", "12px")
+                        .attr("text-anchor", "end")
+                        .attr("x", -3)
+                        .attr("y", 5)
+                        .text("Start of Home Computing");
+                }
 
                 // Set SVG axis
                 // Y axis

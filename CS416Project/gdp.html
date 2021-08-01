@@ -54,9 +54,12 @@
         <div>
             <p class="bottom-three">
                 Although we saw on the previous page that regions subtantially differ in
-                CO2 emissions per capita, trade between contries in different regions may 
+                CO2 emissions per capita, trade between contries in different regions may
                 distort the per capita emissions. To account fot trade, we can futher investigate
-                by viewing CO2 emissions plotted against a country's gross domestic product (GDP).
+                by viewing CO2 emissions plotted against a country's gross domestic product (GDP). 
+                <br>
+                Note that we only plot countries with at least 1 million T of CO2 emmissions in the 
+                selected year.
             </p>
         </div>
         <div>
@@ -199,6 +202,31 @@
                             .duration(500)
                             .style("opacity", 0);
                     });
+
+                function plotCountry(countryName, xPos, yPos, startYear, label) {
+                    if (sliderTimeVal.getYear() + 1900 >= startYear) {
+                        country_data = raw_data.filter(function (d) {
+                            return (d.year == (sliderTimeVal.getYear() + 1900)) &&
+                                (d.country == countryName)
+                        })
+                        d3.select("svg").append("g")
+                            .attr("transform", "translate(" + (xs(country_data[0].co2) + margin) + "," + (ys(
+                                country_data[0].gdp) + margin) + ")")
+                            .append("text")
+                            .style("font-size", "12px")
+                            .attr("text-anchor", "end")
+                            .attr("x", xPos)
+                            .attr("y", yPos)
+                            .text(label);
+                    }
+                };
+                plotCountry("United Kingdom", 8, 16, 1800, "UK");
+                plotCountry("China", 13, 16, 1960, "China");
+                plotCountry("United States", 12, 16, 1800, "USA");
+                plotCountry("Japan", 14, 16, 1875, "Japan");
+                plotCountry("India", 13, 16, 1884, "India");
+                plotCountry("Canada", 20, 16, 1870, "Canada");
+
 
                 // Set SVG axis
                 // Y axis
