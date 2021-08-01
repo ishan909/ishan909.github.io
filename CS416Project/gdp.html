@@ -53,12 +53,12 @@
     <div class="row justify-content-center">
         <div>
             <p class="bottom-three">
-                Although we saw on the previous page that regions subtantially differ in
+                Although we saw on the previous slide that regions subtantially differ in
                 CO2 emissions per capita, trade between contries in different regions may
-                distort the per capita emissions. To account fot trade, we can futher investigate
-                by viewing CO2 emissions plotted against a country's gross domestic product (GDP). 
+                distort the per capita emissions. To account for trade, we can futher investigate
+                by viewing CO2 emissions plotted against a country's gross domestic product (GDP).
                 <br>
-                Note that we only plot countries with at least 1 million T of CO2 emmissions in the 
+                Note that we only plot countries with at least 1 million T of CO2 emissions in the
                 selected year.
             </p>
         </div>
@@ -109,7 +109,8 @@
                 "https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-data.csv"
             );
             const region_map = await d3.csv(
-                "https://raw.githubusercontent.com/owid/co2-data/master/scripts/input/shared/continents.csv");
+                "https://raw.githubusercontent.com/owid/co2-data/master/scripts/input/shared/continents.csv"
+            );
 
             // Time slider
             // Code reference: https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
